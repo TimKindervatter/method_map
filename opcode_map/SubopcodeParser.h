@@ -20,7 +20,7 @@ public:
 
 private:
     template<typename... Ts>
-    using member_ptr_t = void (SubopcodeParser::*)(Ts...); //std::function<void(SubopcodeParser*, Ts...)>;
+    using member_ptr_t = void (SubopcodeParser::*)(Ts...);
 
     using map_pointer_types = std::variant
     <
@@ -141,42 +141,3 @@ void SubopcodeParser::print_invalid_opcode_subopcode_pair_message(int opcode, in
     print_opcode_signature(opcode, subopcode, parameters...);
     std::cout << "Error: Invalid Opcode/Subopcode pair.\n\n";
 }
-
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<int>> opcode_map<int>
-    //{
-    //    { {1, 2}, & SubopcodeParser::mf1 }
-    //};
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<const char*>> opcode_map<const char*>
-    //{
-    //    { {2, 4}, & SubopcodeParser::mf2 }
-    //};
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<>> opcode_map<>
-    //{
-    //    { {3, 2}, & SubopcodeParser::mf3 }
-    //};
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<std::vector<int>>> opcode_map<std::vector<int>>
-    //{
-    //    { {4, 1}, & SubopcodeParser::mf4 }
-    //};
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<std::vector<std::string>>> opcode_map<std::vector<std::string>>
-    //{
-    //    { {5, 3}, & SubopcodeParser::mf5 }
-    //};
-
-    //template<>
-    //inline const std::map<std::pair<int, int>, member_ptr_t<double, std::string>> opcode_map<double, std::string>
-    //{
-    //    { {1, 1}, & SubopcodeParser::mf6 }
-    //};
-
-
