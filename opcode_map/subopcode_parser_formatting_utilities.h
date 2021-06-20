@@ -32,3 +32,21 @@ void print_opcode_signature(int opcode, int subopcode, Ts... parameters)
     }
     std::cout << "\n";
 }
+
+
+template<typename Variant, typename T, T... index>
+void print_variant_types_impl(std::integer_sequence<T, index...> sequence)
+{
+    static_assert(is_variant_v<Variant>, "The supplied type must be a variant.");
+    ((std::cout << "\n\t" << pretty_print_type_name_v<std::variant_alternative_t<index, Variant>> << '\n'), ...);
+    std::cout << "\n";
+}
+
+
+template<typename Variant>
+void print_variant_types()
+{
+    static_assert(is_variant_v<Variant>, "The supplied type must be a variant.");
+    auto indices = std::make_index_sequence<std::variant_size_v<Variant>>{};
+    print_variant_types_impl<Variant>(indices);
+}
