@@ -25,12 +25,25 @@ int main()
     a.choose_member(6, 1, 3.1415926, "Hello");   // Works, binds to choose_member(int, int, double, const std::string&)
 
     a.choose_member(6, 3, 42);  // Fails, because opcode/subopcode pair (6, 3) does not correspond to an entry in the member pointer map. Fails gracefully at runtime and prints error message.
+    
     a.choose_member(1, 2, "Hello");  // Fails, because the the only member pointer that is mapped to by the opcode/subopcode pair (1, 2) takes argument int, not const char*. Fails gracefully at runtime and prints error message.
     a.choose_member(1, 2, nullptr);  // Fails, because the overload const char Fails gracefully at runtime and prints error message.
+    a.choose_member(1, 2);
     a.choose_member(1, 2, 3.1415926, "Hello"); // Fails, because opcode / subopcode pair(6, 3) does not correspond to an entry in the member pointer map.Fails gracefully at runtime and prints error message.
 
     a.choose_member(2, 4, 42);
+    a.choose_member(2, 4, nullptr);
+    a.choose_member(2, 4);
     a.choose_member(2, 4, 3.1415926, "Hello");
+
+    a.choose_member(3, 2, 42);
+
+    a.choose_member(4, 1, 42);
+
+    a.choose_member(5, 3, 42);
+
+    a.choose_member(6, 1, 42);
+
 
     return 0;
 }

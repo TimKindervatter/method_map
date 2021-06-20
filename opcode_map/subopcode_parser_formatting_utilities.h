@@ -23,14 +23,14 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
 template<typename... Ts>
 void print_opcode_signature(int opcode, int subopcode, Ts... parameters)
 {
-    std::cout << "Opcode: " << opcode << ", SubOpcode: " << subopcode << ", Parameters: ";
+    std::cout << "Opcode: " << opcode << ", SubOpcode: " << subopcode << ", Parameters: {";
     if constexpr (sizeof...(parameters) == 0)
         std::cout << "None";
     else
     {
         std::cout << format_as_comma_separated_list(parameters...);
     }
-    std::cout << "\n";
+    std::cout << "}\n";
 }
 
 

@@ -76,10 +76,17 @@ void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parame
 {
     if constexpr (is_variant_alternative<map_pointer_types, member_ptr_t<Ts...>>)
     {
+        // equal_range returns a pair of iterators denoting a list of all members that have equivalent keys. 
+        // The first iterator points to the first element whose key is not less than the one passed to equal_range,
+        // and the second iterator points to the first element whose key is greater than the one passed to equal_range.
         auto variant_range = opcode_map.equal_range({ opcode, subopcode });
 
         if (variant_range.first == std::end(opcode_map) && variant_range.second == std::end(opcode_map))
         {
+            // If both iterators returned from equal_range are the end iterator, it means that no keys
+            // in the map were equivalent to the one passed to equal_range. 
+            // That is, the passed opcode/subopcode pair has no corresponding values in the map.
+
             print_invalid_opcode_subopcode_pair_message(opcode, subopcode, parameters...);
             return;
         }
@@ -88,7 +95,7 @@ void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parame
         {
             try
             {
-                auto member_pointer = std::get<member_ptr_t<Ts...>>(variant_iter->second);
+                auto member_pointer = std::get<member_ptr_t<Ts...>>(variant_iter->second); // Throws bad_variant_access upon failure
                 std::invoke(member_pointer, this, parameters...);
 
                 // If we've gotten here, it means that one of the members of the map has arguments which match the types
@@ -99,8 +106,8 @@ void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parame
             {
                 // Don't print an error message yet. If multiple opcode/subopcode pairs are in the map, then
                 // all but one of them will cause a bad variant access. We only want to print an error message
-                // if all of them cause a bad variant access because this means that the passed parameters do not match
-                // any of the members of the map for that opcode/subopcode pair.
+                // if all of them cause a bad variant access because this means that the types passed parameters do not match
+                // the parameter lists of any of the member pointers in the map for that opcode/subopcode pair.
             }
         }
 
@@ -128,7 +135,7 @@ void SubopcodeParser::print_invalid_types_error_message(int opcode, int subopcod
     if constexpr (sizeof...(Ts) > 0)
         std::cout << "Error: Invalid argument types. The types passed were: " << type_names << ".\n";
     else
-        std::cout << "Error: Invalid argument types. The types passed were: void.\n";
+        std::cout << "Error: Invalid argument types. The types passed were: {void}.\n";
 
     std::cout << "Argument types must match one of the following function signatures:\n";
 
@@ -136,7 +143,7 @@ void SubopcodeParser::print_invalid_types_error_message(int opcode, int subopcod
 
     for (auto variant_iter = variant_range.first; variant_iter != variant_range.second; ++variant_iter)
     {
-        print_variant_types<map_pointer_types>(variant_iter->second);
+        print_variant_types(variant_iter->second);
     }
 
     std::cout << "\n";
