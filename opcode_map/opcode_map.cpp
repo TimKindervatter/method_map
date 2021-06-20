@@ -29,5 +29,8 @@ int main()
     a.choose_member(1, 2, nullptr);  // Fails, because the overload const char Fails gracefully at runtime and prints error message.
     a.choose_member(1, 2, 3.1415926, "Hello"); // Fails, because opcode / subopcode pair(6, 3) does not correspond to an entry in the member pointer map.Fails gracefully at runtime and prints error message.
 
+    a.choose_member(2, 4, 42);
+    a.choose_member(2, 4, 3.1415926, "Hello");
+
     return 0;
 }

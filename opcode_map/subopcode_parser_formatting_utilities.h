@@ -35,7 +35,7 @@ void print_opcode_signature(int opcode, int subopcode, Ts... parameters)
 
 
 template<typename Variant, typename T, T... index>
-void print_variant_types_impl(std::integer_sequence<T, index...> sequence)
+void print_all_variant_types_impl(std::integer_sequence<T, index...> sequence)
 {
     static_assert(is_variant_v<Variant>, "The supplied type must be a variant.");
     ((std::cout << "\n\t" << pretty_print_type_name_v<std::variant_alternative_t<index, Variant>> << '\n'), ...);
@@ -44,9 +44,25 @@ void print_variant_types_impl(std::integer_sequence<T, index...> sequence)
 
 
 template<typename Variant>
-void print_variant_types()
+void print_all_variant_types()
 {
     static_assert(is_variant_v<Variant>, "The supplied type must be a variant.");
     auto indices = std::make_index_sequence<std::variant_size_v<Variant>>{};
-    print_variant_types_impl<Variant>(indices);
+    print_all_variant_types_impl<Variant>(indices);
+}
+
+
+template<typename Variant>
+void print_variant_types(const Variant& v)
+{
+    static_assert(is_variant_v<Variant>, "The supplied type must be a variant.");
+
+    std::string type_name = std::visit(
+        [](auto&& arg) -> std::string
+        {
+            using T = std::decay_t<decltype(arg)>;
+            return pretty_print_type_name_v<T>;
+        }, v);
+
+    std::cout << "\n\t" << type_name << '\n';
 }

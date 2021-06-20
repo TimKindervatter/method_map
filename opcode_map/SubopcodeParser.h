@@ -81,6 +81,7 @@ void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parame
         if (variant_range.first == std::end(opcode_map) && variant_range.second == std::end(opcode_map))
         {
             print_invalid_opcode_subopcode_pair_message(opcode, subopcode, parameters...);
+            return;
         }
 
         for (auto variant_iter = variant_range.first; variant_iter != variant_range.second; ++variant_iter)
@@ -130,7 +131,14 @@ void SubopcodeParser::print_invalid_types_error_message(int opcode, int subopcod
         std::cout << "Error: Invalid argument types. The types passed were: void.\n";
 
     std::cout << "Argument types must match one of the following function signatures:\n";
-    print_variant_types<map_pointer_types>();
+
+    auto variant_range = opcode_map.equal_range({ opcode, subopcode });
+
+    for (auto variant_iter = variant_range.first; variant_iter != variant_range.second; ++variant_iter)
+    {
+        print_variant_types<map_pointer_types>(variant_iter->second);
+    }
+
     std::cout << "\n";
 }
 
