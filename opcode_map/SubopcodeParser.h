@@ -52,9 +52,16 @@ private:
     template<typename... Ts, typename = std::enable_if_t<is_variant_alternative<map_pointer_types, member_ptr_t<Ts...>>>>
     void choose_member_impl(int opcode, int subopcode, Ts... parameters);
 
-    inline static const std::map<std::pair<int, int>, map_pointer_types> opcode_map
+    template<typename... Ts>
+    void print_invalid_types_error_message(int opcode, int subopcode, Ts... parameters);
+
+    template<typename... Ts>
+    void print_invalid_opcode_subopcode_pair_message(int opcode, int subopcode, Ts... parameters);
+
+    inline static const std::multimap<std::pair<int, int>, map_pointer_types> opcode_map
     {
         { {1, 2}, &SubopcodeParser::mf1 },
+        { {1, 2}, &SubopcodeParser::mf7 },
         { {2, 4}, &SubopcodeParser::mf2 },
         { {3, 2}, &SubopcodeParser::mf3 },
         { {4, 1}, &SubopcodeParser::mf4 },
@@ -67,29 +74,74 @@ private:
 template<typename... Ts, typename>
 void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parameters)
 {
-    try
+    if constexpr (is_variant_alternative<map_pointer_types, member_ptr_t<Ts...>>)
     {
-        map_pointer_types variant = opcode_map.at({ opcode, subopcode });
-        auto member_pointer = std::get<member_ptr_t<Ts...>>(variant);
-        std::invoke(member_pointer, this, parameters...);
-    }
-    catch (std::out_of_range&)
-    {
-        print_opcode_signature(opcode, subopcode, parameters...);
-        std::cout << "Error: Invalid Opcode/Subopcode pair.\n\n";
-    }
-    catch (std::bad_variant_access&)
-    {
-        print_opcode_signature(opcode, subopcode, parameters...);
+        auto variant_range = opcode_map.equal_range({ opcode, subopcode });
 
-        std::vector<std::string> type_names{ pretty_print_type_name_v<Ts>... };
-        std::cout << "Error: Invalid argument types. The types passed were: " << type_names << ".\n";
+        if (variant_range.first == std::end(opcode_map) && variant_range.second == std::end(opcode_map))
+        {
+            print_invalid_opcode_subopcode_pair_message(opcode, subopcode, parameters...);
+        }
 
-        std::cout << "Argument types must match one of the following function signatures:\n";
-        print_variant_types<map_pointer_types>();
-        std::cout << "\n";
+        for (auto variant_iter = variant_range.first; variant_iter != variant_range.second; ++variant_iter)
+        {
+            try
+            {
+                auto member_pointer = std::get<member_ptr_t<Ts...>>(variant_iter->second);
+                std::invoke(member_pointer, this, parameters...);
+
+                // If we've gotten here, it means that one of the members of the map has arguments which match the types
+                // of the matched parameters. Return early to indicate success.
+                return;
+            }
+            catch (const std::bad_variant_access&)
+            {
+                // Don't print an error message yet. If multiple opcode/subopcode pairs are in the map, then
+                // all but one of them will cause a bad variant access. We only want to print an error message
+                // if all of them cause a bad variant access because this means that the passed parameters do not match
+                // any of the members of the map for that opcode/subopcode pair.
+            }
+        }
+
+        // If we've gotten here, it means we didn't return early, which can only happen if the passed parameters
+        // don't match any of the members corresponding to the passed opcode/subopcode pair.
+        // Issue an error message to indicate this failure. 
+        print_invalid_types_error_message(opcode, subopcode, parameters...);
+    }
+    else
+    {
+        // Theoretically, this branch should never be taken, because SFINAE will prevent instantiation of an overload if
+        // the passed parameters' types do not match any of the members of the map.
+        // Just to be safe, keep this here as an extra precaution.
+        print_invalid_types_error_message(opcode, subopcode, parameters...);
     }
 }
+
+
+template<typename... Ts>
+void SubopcodeParser::print_invalid_types_error_message(int opcode, int subopcode, Ts... parameters)
+{
+    print_opcode_signature(opcode, subopcode, parameters...);
+
+    std::vector<std::string> type_names{ pretty_print_type_name_v<Ts>... };
+    if constexpr (sizeof...(Ts) > 0)
+        std::cout << "Error: Invalid argument types. The types passed were: " << type_names << ".\n";
+    else
+        std::cout << "Error: Invalid argument types. The types passed were: void.\n";
+
+    std::cout << "Argument types must match one of the following function signatures:\n";
+    print_variant_types<map_pointer_types>();
+    std::cout << "\n";
+}
+
+
+template<typename... Ts>
+void SubopcodeParser::print_invalid_opcode_subopcode_pair_message(int opcode, int subopcode, Ts... parameters)
+{
+    print_opcode_signature(opcode, subopcode, parameters...);
+    std::cout << "Error: Invalid Opcode/Subopcode pair.\n\n";
+}
+
 
     //template<>
     //inline const std::map<std::pair<int, int>, member_ptr_t<int>> opcode_map<int>

@@ -7,6 +7,8 @@ int main()
     a.choose_member(1, 2, 3.1415926);               // Works, binds to choose_member(int, int, int) since double is convertible to int in last argument
     a.choose_member(1, 2, true);                    // Works, binds to choose_member(int, int, int) since bool is convertible to int in last argument
 
+    a.choose_member(1, 2);                          // Works, binds to choose_member(int, int)
+
     a.choose_member(2, 4, "Hello");                 // Works, binds to choose_member(int, int, const char*)
     //a.choose_member(2, 4, std::string("World"));  // Compilation failure, no overload of choose_member takes std::string&&
     std::string s = "World";

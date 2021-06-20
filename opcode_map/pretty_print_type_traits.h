@@ -1,6 +1,7 @@
 #pragma once
 
-#include "subopcode_parser_formatting_utilities.h"
+#include "variant_type_traits.h"
+#include "delimited_list_formatting_utilities.h"
 
 #include <string>
 #include <iostream>
