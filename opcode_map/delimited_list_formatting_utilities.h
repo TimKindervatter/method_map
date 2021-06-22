@@ -1,5 +1,7 @@
 #pragma once
 
+#include "compile_time_join.h"
+
 #include <string>
 #include <map>
 #include <vector>
@@ -59,3 +61,23 @@ std::string format_as_comma_separated_list(const std::vector<T>& v)
 
     return ss.str();
 }
+
+
+template<const std::string_view& Delimiter, const std::string_view& First, const std::string_view&... Rest>
+struct delimited_list
+{
+    template<const std::string_view& D, const std::string_view&... R>
+    constexpr static std::string_view impl()
+    {
+        if constexpr (sizeof...(Rest) > 0)
+        {
+            return join_v<First, D, delimited_list<D, R...>::value>;
+        }
+        else
+        {
+            return First;
+        }
+    }
+
+    constexpr static inline std::string_view value = impl<Delimiter, Rest...>();
+};

@@ -131,7 +131,7 @@ void SubopcodeParser::print_invalid_types_error_message(int opcode, int subopcod
 {
     print_opcode_signature(opcode, subopcode, parameters...);
 
-    std::vector<std::string> type_names{ pretty_print_type_name_v<Ts>... };
+    std::vector<std::string_view> type_names{ pretty_print_type_name_v<Ts>... };
     if constexpr (sizeof...(Ts) > 0)
         std::cout << "Error: Invalid argument types. The types passed were: " << type_names << ".\n";
     else

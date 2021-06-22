@@ -145,6 +145,7 @@
     <ClCompile Include="SubopcodeParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="compile_time_join.h" />
     <ClInclude Include="delimited_list_formatting_utilities.h" />
     <ClInclude Include="pretty_print_type_traits.h" />
     <ClInclude Include="SubopcodeParser.h" />

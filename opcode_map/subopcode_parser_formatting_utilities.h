@@ -61,7 +61,7 @@ void print_variant_types(const Variant& v)
         [](auto&& arg) -> std::string
         {
             using T = std::decay_t<decltype(arg)>;
-            return pretty_print_type_name_v<T>;
+            return std::string(pretty_print_type_name_v<T>);
         }, v);
 
     std::cout << "\n\t" << type_name << '\n';
