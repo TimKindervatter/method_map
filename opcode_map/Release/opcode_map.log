@@ -1,9 +1,0 @@
-﻿  opcode_map.cpp
-C:\Users\Tim\source\repos\opcode_map\opcode_map\opcode_map.cpp(7,27): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-  SubopcodeParser.cpp
-  Generating code
-  114 of 522 functions (21.8%) were compiled, the rest were copied from previous compilation.
-    28 functions were new in current compilation
-    25 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  opcode_map.vcxproj -> C:\Users\Tim\source\repos\opcode_map\Release\opcode_map.exe
