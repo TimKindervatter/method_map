@@ -66,6 +66,7 @@ std::string format_as_comma_separated_list(const std::vector<T>& v)
 template<const std::string_view& Delimiter, const std::string_view& First, const std::string_view&... Rest>
 struct delimited_list
 {
+private:
     template<const std::string_view& D, const std::string_view&... R>
     constexpr static std::string_view impl()
     {
@@ -79,5 +80,6 @@ struct delimited_list
         }
     }
 
+public:
     constexpr static inline std::string_view value = impl<Delimiter, Rest...>();
 };
