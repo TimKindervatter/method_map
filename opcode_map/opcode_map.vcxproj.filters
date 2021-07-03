@@ -38,5 +38,8 @@
     <ClInclude Include="delimited_list_formatting_utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="compile_time_join.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
