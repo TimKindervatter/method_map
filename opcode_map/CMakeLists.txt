@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(opcode_map LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+FILE(GLOB OPCODE_MAP_HEADERS "*.h")
+FILE(GLOB OPCODE_MAP_SOURCES "*.cpp")
+
+add_executable(opcode_map ${OPCODE_MAP_HEADERS} ${OPCODE_MAP_SOURCES})
