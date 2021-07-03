@@ -48,6 +48,7 @@ private:
     void mf5(std::vector<std::string> v) { std::cout << "mf5(" << v << ")\n\n"; }
     void mf6(double d, std::string s) { std::cout << "mf6(" << d << ", " << s << ")\n\n"; }
     void mf7() { std::cout << "mf7()\n\n"; }
+    void mf8(int i) { std::cout << "mf8(" << i << ")\n\n"; }
 
     template<typename... Ts, typename = std::enable_if_t<is_variant_alternative<map_pointer_types, member_ptr_t<Ts...>>>>
     void choose_member_impl(int opcode, int subopcode, Ts... parameters);
@@ -61,6 +62,7 @@ private:
     inline static const std::multimap<std::pair<int, int>, map_pointer_types> opcode_map
     {
         { {1, 2}, &SubopcodeParser::mf1 },
+        { {1, 2}, &SubopcodeParser::mf8 },
         { {1, 2}, &SubopcodeParser::mf7 },
         { {2, 4}, &SubopcodeParser::mf2 },
         { {3, 2}, &SubopcodeParser::mf3 },
@@ -91,30 +93,42 @@ void SubopcodeParser::choose_member_impl(int opcode, int subopcode, Ts... parame
             return;
         }
 
+        bool matching_method_found = false;
+
         for (auto variant_iter = variant_range.first; variant_iter != variant_range.second; ++variant_iter)
         {
-            try
-            {
-                auto member_pointer = std::get<member_ptr_t<Ts...>>(variant_iter->second); // Throws bad_variant_access upon failure
-                std::invoke(member_pointer, this, parameters...);
+            auto current_variant_alternative = variant_iter->second;
 
-                // If we've gotten here, it means that one of the members of the map has arguments which match the types
-                // of the matched parameters. Return early to indicate success.
-                return;
-            }
-            catch (const std::bad_variant_access&)
-            {
-                // Don't print an error message yet. If multiple opcode/subopcode pairs are in the map, then
-                // all but one of them will cause a bad variant access. We only want to print an error message
-                // if all of them cause a bad variant access because this means that the types passed parameters do not match
-                // the parameter lists of any of the member pointers in the map for that opcode/subopcode pair.
-            }
+            // Information on std::variant and std::visit: https://arne-mertz.de/2018/05/modern-c-features-stdvariant-and-stdvisit/
+            
+            // std::visit is essentially a switch statement that switches on each alternative of a std::variant.
+            // The first argument is the visitor - a callable that polymorphically chooses its behavior depending 
+            // on the type of the variant alternative that is passed.
+            // 
+            // In this case, we use a lambda that checks whether the current variant alternative's value is an element in the
+            // opcode map. If so, it invokes that value (which is a member function pointer) 
+            // with the parameters passed into choose_member_impl.
+
+            std::visit(
+                [&, this](auto member_pointer)
+                {
+                    using T = decltype(member_pointer);
+                    if constexpr (std::is_same_v<T, member_ptr_t<Ts...>>)
+                    {
+                        std::invoke(member_pointer, this, parameters...);
+                        matching_method_found = true;
+                    }
+                }, current_variant_alternative);
         }
-
-        // If we've gotten here, it means we didn't return early, which can only happen if the passed parameters
-        // don't match any of the members corresponding to the passed opcode/subopcode pair.
-        // Issue an error message to indicate this failure. 
-        print_invalid_types_error_message(opcode, subopcode, parameters...);
+            
+        if (!matching_method_found)
+        {
+            // If we've gotten here, it means that none of the member functions corresponding 
+            // to the passed opcode/subopcode pair take arguments whose types 
+            // match Ts (i.e the types of the parameters passed to choose_member_impl). 
+            // Issue an error message to indicate this failure. 
+            print_invalid_types_error_message(opcode, subopcode, parameters...);
+        }
     }
     else
     {
