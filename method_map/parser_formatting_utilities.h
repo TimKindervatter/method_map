@@ -21,9 +21,9 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
 
 
 template<typename... Ts>
-void print_opcode_signature(int opcode, int subopcode, Ts... parameters)
+void print_first_signature(int first, int second, Ts... parameters)
 {
-    std::cout << "Opcode: " << opcode << ", SubOpcode: " << subopcode << ", Parameters: {";
+    std::cout << "first: " << first << ", second: " << second << ", Parameters: {";
     if constexpr (sizeof...(parameters) == 0)
         std::cout << "None";
     else

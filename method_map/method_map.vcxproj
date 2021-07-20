@@ -24,6 +24,7 @@
     <ProjectGuid>{0c4b34c9-fdab-475d-a869-de9613501259}</ProjectGuid>
     <RootNamespace>opcodemap</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>method_map</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -141,15 +142,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="opcode_map.cpp" />
-    <ClCompile Include="SubopcodeParser.cpp" />
+    <ClCompile Include="method_map.cpp" />
+    <ClCompile Include="PairParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="compile_time_join.h" />
     <ClInclude Include="delimited_list_formatting_utilities.h" />
     <ClInclude Include="pretty_print_type_traits.h" />
-    <ClInclude Include="SubopcodeParser.h" />
-    <ClInclude Include="subopcode_parser_formatting_utilities.h" />
+    <ClInclude Include="PairParser.h" />
+    <ClInclude Include="parser_formatting_utilities.h" />
     <ClInclude Include="variant_type_traits.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

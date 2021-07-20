@@ -10,7 +10,7 @@
 #include <functional>
 #include <string_view>
 
-class SubopcodeParser;
+class PairParser;
 
 
 constexpr inline static std::string_view delimiter = ", ";
@@ -63,9 +63,9 @@ struct pretty_print_type_name<std::vector<T>>
 };
 
 template<>
-struct pretty_print_type_name<SubopcodeParser>
+struct pretty_print_type_name<PairParser>
 {
-    constexpr inline static std::string_view value = "SubopcodeParser";
+    constexpr inline static std::string_view value = "PairParser";
 };
 
 template<typename R, typename Object, typename... Ts>
